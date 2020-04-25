@@ -1,1 +1,5 @@
 On 00EE check if you are returning from subroutine correctly
+
+using namespave architecture is probably a bad idea
+
+FX1E check if the assignement of I is too early

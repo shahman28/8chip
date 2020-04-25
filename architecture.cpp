@@ -198,8 +198,173 @@ bool load(const char *file_path){
               if
               pc += 2;
               break;
+            case 0x0005:
+              if(V[(opcode & 0x00F0) >> 4] > V[(opcode & 0x0F00) >> 8])
+                  V[0xF] = 0;
+              else
+                  V[0xF] = 1;
+              V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];
+              pc += 2;
+              break;
+
+          // 0x8XY6
+          case 0x0006:
+              V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x1;
+              V[(opcode & 0x0F00) >> 8] >>= 1;
+              pc += 2;
+              break;
+
+          // 0x8XY7
+          case 0x0007:
+              if(V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])	// VY-VX
+                  V[0xF] = 0; // there is a borrow
+              else
+                  V[0xF] = 1;
+              V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];
+              pc += 2;
+              break;
+
+          // 0x8XYE
+          case 0x000E:
+              V[0xF] = V[(opcode & 0x0F00) >> 8] >> 7;
+              V[(opcode & 0x0F00) >> 8] <<= 1;
+              pc += 2;
+              break;
+
+          default:
+              printf("\nUnknown op code: %.4X\n", opcode);
+              exit(3);
+      }
+      //9XY0
+      case (0x9000):
+        if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4]){
+          pc += 4;
+        }
+        else{
+          pc += 2
+        }
+        break;
+      //ANNN
+      case (0xA000):
+        I = opcode & 0x0FFF;
+        pc += 2;
+        break;
+      //BNNN
+      case (0xB000):
+        pc = (opcode & 0x0FFF) + V[0];
+        break;
+      //CXNN
+      case (0xC000):
+        V[(opcode & 0x0F00) >> 8] = (rand % (0xFF + 1) & (opcode & 0x00FF));
+        pc += 2;
+        break;
+      //DXYN
+      case (0xD000):
+        unsigned short x = V[(opcode & 0x0F00) >> 8];
+        unsigned short y = V[(opcode & 0x0F00) >> 4];
+        unsigned short height = opcode & 0x000F;
+        unsigned short location;
+
+        V[0xF] = 0
+        for (int ypos = 0; ypos < height; ++ypos){
+          location = memory[I + ypos];
+          for (int xpos = 0; xpos < 8; ++xpos){
+            if ((location &(0x80 >> xpos)) != 0){
+              if (gfx[(x + xpos + ((y*ypos)*64))] == 1){
+                v[0xF] = 1;
+              }
+              gfx[(x + xpos + ((y*ypos)*64))] ^= 1;
+            }
 
           }
+        }
+
+        drawFlag = true;
+        pc += 2;
+        break;
+      case 0xE000:
+
+        switch (opcode & 0x00FF){
+
+          case (0x009E):
+            if (key[V[(opcode & 0x0F00) >> 8]] != 0){
+              pc += 4;
+            }
+            else{
+              pc += 2;
+            }
+            break;
+          case(0x00A1){
+            if (key[V[(opcode & 0x0F00) >> 8]] == 0){
+              pc += 4;
+            }
+            else{
+              pc += 2;
+            }
+            break;
+          }
+          default:
+            printf("unknown opcode");
+        }
+      case 0xF000:
+        switch(opcode & 0x00FF){
+
+          case(0x0007):
+            V[(opcode & 0x0F00) >> 8] = delay_timer;
+            pc += 2;
+            break;
+
+          case(0x000A):
+            bool keyPressed = False;
+            for (int i = 0; i < 16; ++i){
+              if (key[i] != 0){
+                V[(opcode & 0x0F00) >> 8] = i;
+                keyPressed = true;
+              }
+            }
+            if(!keyPressed)
+              return;
+
+            pc += 2;
+            break;
+
+          case(0x0015):
+            delay_timer = V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+
+          case(0x0018):
+            sound_timer = V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+          case(0x001E):
+            V[(opcode & 0x0F00) >> 8] += I;
+            if (V[(opcode & 0x0F00) >> 8] > 0xFFF){
+              V[0xF] = 1
+            }
+            else{
+              V[0xF] = 0;
+            }
+            pc += 2
+            break;
+          case (0x0029):
+            I = V[(opcode & 0x0F00) >> 8] * 0x5;
+            pc += 2
+            break;
+          case (0x0033):
+            memory[I]     = V[(opcode & 0x0F00) >> 8] / 100;
+            memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+            memory[I + 2] = V[(opcode & 0x0F00) >> 8] % 10;
+            pc += 2;
+            break;
+          case (0x0055):
+          case (0x0065):
+
+        }
+
+
+
+
 
 
 
