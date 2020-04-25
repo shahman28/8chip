@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 class Chip8 {
-private:
+  private:
     unsigned short stack[16];                 // Stack
     unsigned short sp;                        // Stack pointer
 
@@ -20,7 +20,9 @@ private:
 
     void init();
 
-public:
+    void decodeOpcode();               //helper method
+
+  public:
     unsigned char  gfx[64 * 32];              // Graphics buffer
     unsigned char  key[16];                   // Keypad
     bool drawFlag;                      // Indicates a draw has occurred
@@ -28,7 +30,7 @@ public:
     Chip8();
     ~Chip8();
 
-    void emulate_cycle();               // Emulate one cycle
+    void emulate_cycle();           // Emulate one cycle
     bool load(const char *file_path);   // Load application
 };
 
