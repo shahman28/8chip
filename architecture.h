@@ -1,61 +1,35 @@
-
 #ifndef ARCHITECTURE_H
 #define ARCHITECTURE_H
 
-  class architecture(){
+#include <stdint.h>
 
-    architecture(){
+class Chip8 {
+private:
+    unsigned short stack[16];                 // Stack
+    unsigned short sp;                        // Stack pointer
 
-    }
-    unsigned short opcode;
-    unsigned short memory[4096];
-    unsigned short I;
-    unsigned short pc;
-    //register position
-    unsigned char V[16];
-    //pixel display
-    unsigned char gfx[64*32];
-    unsigned char delay_timer;
-    unsigned char sound_timer;
+    unsigned char memory[4096];               // Memory (4k)
+    unsigned char V[16];                      // V registers (V0-VF)
 
-    //stack position
-    unsigned short stack[16];
-    unsigned short sp;
+    unsigned short pc;                        // Program counter
+    unsigned short opcode;                    // Current op code
+    unsigned short I;                         // Index register
 
-    //input
-    unsigned char Key[16];
+    unsigned char delay_timer;                // Delay timer
+    unsigned char sound_timer;                // Sound timer
 
-    // initializes registers and memory
-    void initialize (){
+    void init();
 
+public:
+    unsigned char  gfx[64 * 32];              // Graphics buffer
+    unsigned char  key[16];                   // Keypad
+    bool drawFlag;                      // Indicates a draw has occurred
 
-    }
-    //runs the emulation cyle
-    void emulateCycle(){
-      opcode = memory[pc] << 8 | memory[pc+1]
-      // Decode Opcode
-      // Execute Opcode
+    Chip8();
+    ~Chip8();
 
-      // Update timers
-    }
+    void emulate_cycle();               // Emulate one cycle
+    bool load(const char *file_path);   // Load application
+};
 
-    void loadGame(String s){
-      //choose the game that will be played
-    }
-
-    //if set draw graphics
-    boolean drawFlag(){
-
-    }
-
-    void setKeys(){
-      //store input
-    }
-
-    void decodeOpcode(unsigned short i){
-      if (i ==  )
-
-    }
-
-
-  };
+#endif // CHIP_8_H
